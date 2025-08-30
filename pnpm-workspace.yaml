@@ -1,5 +1,5 @@
 packages:
-  - "apps/*"
-
+  - 'apps/*'
+  - 'apps/sample-project/*'
 autoInstallPeers: true
 strictPeerDependencies: false

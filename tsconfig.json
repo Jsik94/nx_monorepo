@@ -3,5 +3,11 @@
   "compileOnSave": false,
   "files": [],
   "references": [
+    {
+      "path": "./apps/sample-project/fe-board-e2e"
+    },
+    {
+      "path": "./apps/sample-project/fe-board"
+    }
   ]
 }

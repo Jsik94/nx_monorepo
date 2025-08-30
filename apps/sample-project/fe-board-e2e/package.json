@@ -1,0 +1,10 @@
+{
+  "name": "@monorepo/fe-board-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "@monorepo/fe-board"
+    ]
+  }
+}
