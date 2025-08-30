@@ -3,11 +3,5 @@
   "compileOnSave": false,
   "files": [],
   "references": [
-    {
-      "path": "./apps/be-sample-e2e"
-    },
-    {
-      "path": "./apps/be-sample"
-    }
   ]
 }
