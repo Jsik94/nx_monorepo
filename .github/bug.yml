@@ -1,0 +1,9 @@
+name: 🐞 Bug
+description: 버그 신고
+labels: [bug]
+body:
+  - type: textarea
+    id: desc
+    attributes:
+      label: 무엇이 잘못됐나요?
+      required: true
