@@ -1,0 +1,10 @@
+name: 📋 Task
+description: 일반 작업
+labels: [chore]
+body:
+  - type: textarea
+    id: todo
+    attributes:
+      label: 할 일
+      placeholder: "- [ ] 항목1"
+      required: true

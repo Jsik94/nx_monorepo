@@ -1,0 +1,56 @@
+# Alloy Producer Configuration
+# 로그 수집 및 전처리 후 Kafka로 전송
+
+// 로그 파일 스크랩
+local.file_match "log_files" {
+  path_targets = [
+    {__path__ = "/var/log/*.log"},
+    {__path__ = "/app/logs/*.log"},
+  ]
+}
+
+// 로그 프로세싱
+loki.source.file "logs" {
+  targets    = local.file_match.log_files.targets
+  forward_to = [loki.process.parse_logs.receiver]
+}
+
+// 로그 파싱 및 라벨링
+loki.process "parse_logs" {
+  forward_to = [loki.write.kafka_producer.receiver]
+
+  stage.json {
+    expressions = {
+      level     = "level",
+      timestamp = "timestamp",
+      message   = "message",
+      service   = "service",
+    }
+  }
+
+  stage.labels {
+    values = {
+      level   = "",
+      service = "",
+    }
+  }
+}
+
+// Kafka 프로듀서
+loki.write "kafka_producer" {
+  endpoint {
+    url = "kafka://kafka:9092"
+    
+    // Kafka 토픽 설정
+    kafka {
+      topic = "logs"
+      // 추가 Kafka 설정
+      producer_config = {
+        "acks" = "all"
+        "retries" = "3"
+        "batch.size" = "16384"
+        "linger.ms" = "5"
+      }
+    }
+  }
+}

@@ -1,0 +1,48 @@
+- name: type:feature
+  color: "2E86AB"
+  description: "새로운 기능 추가"
+- name: type:fix
+  color: "E67E22"
+  description: "버그 수정"
+- name: type:refactor
+  color: "3498DB"
+  description: "코드 리팩토링"
+- name: type:performance
+  color: "F39C12"
+  description: "성능 개선"
+- name: type:test
+  color: "16A085"
+  description: "테스트 추가/수정"
+- name: type:docs
+  color: "9B59B6"
+  description: "문서화"
+- name: type:chore
+  color: "95A5A6"
+  description: "빌드/설정 변경"
+- name: type:hotfix
+  color: "C0392B"
+  description: "긴급 핫픽스"
+- name: type:release
+  color: "8E44AD"
+  description: "릴리즈"
+- name: has-ticket
+  color: "F1C40F"
+  description: "Jira 티켓 연결됨"
+- name: sync:release→develop
+  color: "95A5A6"
+- name: priority:high
+  color: "D35400"
+- name: versioning:semver
+  color: "27AE60"
+- name: guard:override
+  color: "7F8C8D"
+- name: size/XS
+  color: "B3E5FC"
+- name: size/S
+  color: "81D4FA"
+- name: size/M
+  color: "4FC3F7"
+- name: size/L
+  color: "29B6F6"
+- name: size/XL
+  color: "03A9F4"

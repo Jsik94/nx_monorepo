@@ -1,0 +1,9 @@
+name: ✨ Feature
+description: 기능 제안
+labels: [feature]
+body:
+  - type: textarea
+    id: desc
+    attributes:
+      label: 제안 내용
+      required: true
