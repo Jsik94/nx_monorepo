@@ -1,0 +1,98 @@
+#!/bin/bash
+
+# Pre-commit hook
+# 커밋 전에 실행되는 검증 스크립트
+
+echo "🔍 Pre-commit 검증 시작..."
+
+# Nx 워크스페이스 환경에서의 pre-commit 검증
+# 1. 린트 검사
+# 2. 타입 체크
+# 3. 포맷팅 검사
+
+# 변경된 파일들 가져오기
+staged_files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx|js|jsx)$' || true)
+
+if [ -z "$staged_files" ]; then
+    echo "📝 JavaScript/TypeScript 파일 변경사항이 없습니다."
+    echo "✅ Pre-commit 검증 완료!"
+    exit 0
+fi
+
+echo "📁 검증할 파일들:"
+echo "$staged_files" | sed 's/^/   - /'
+
+# 1. ESLint 검사
+echo ""
+echo "🔍 ESLint 검사 중..."
+if command -v npx >/dev/null 2>&1; then
+    if ! echo "$staged_files" | xargs npx eslint --max-warnings=0; then
+        echo ""
+        echo "❌ ESLint 검사 실패!"
+        echo "💡 다음 명령어로 문제를 수정해보세요:"
+        echo "   npx eslint --fix <파일명>"
+        exit 1
+    fi
+    echo "✅ ESLint 검사 통과!"
+else
+    echo "⚠️  npx를 찾을 수 없어 ESLint 검사를 건너뜁니다."
+fi
+
+# 2. TypeScript 타입 체크 (tsc)
+echo ""
+echo "🔍 TypeScript 타입 체크 중..."
+if command -v npx >/dev/null 2>&1; then
+    if ! npx tsc --noEmit; then
+        echo ""
+        echo "❌ TypeScript 타입 체크 실패!"
+        echo "💡 타입 오류를 수정한 후 다시 커밋해주세요."
+        exit 1
+    fi
+    echo "✅ TypeScript 타입 체크 통과!"
+else
+    echo "⚠️  npx를 찾을 수 없어 TypeScript 검사를 건너뜁니다."
+fi
+
+# 3. Prettier 포맷팅 체크
+echo ""
+echo "🔍 Prettier 포맷팅 체크 중..."
+if command -v npx >/dev/null 2>&1; then
+    if ! echo "$staged_files" | xargs npx prettier --check; then
+        echo ""
+        echo "❌ 포맷팅 문제 발견!"
+        echo "💡 다음 명령어로 자동 포맷팅하세요:"
+        echo "   npx prettier --write <파일명>"
+        echo "   또는"
+        echo "   npx prettier --write ."
+        exit 1
+    fi
+    echo "✅ Prettier 포맷팅 체크 통과!"
+else
+    echo "⚠️  npx를 찾을 수 없어 Prettier 검사를 건너뜁니다."
+fi
+
+# 4. 금지된 코드 패턴 체크
+echo ""
+echo "🔍 금지된 코드 패턴 체크 중..."
+
+# console.log 체크 (개발용)
+if echo "$staged_files" | xargs grep -n "console\.log" --color=never 2>/dev/null; then
+    echo ""
+    echo "⚠️  console.log가 발견되었습니다."
+    echo "💡 프로덕션 코드에서 console.log를 제거해주세요."
+    echo "   개발용이라면 이 경고를 무시할 수 있습니다."
+fi
+
+# TODO/FIXME 체크
+todo_count=$(echo "$staged_files" | xargs grep -n -E "(TODO|FIXME|XXX)" --color=never 2>/dev/null | wc -l || echo "0")
+if [ "$todo_count" -gt 0 ]; then
+    echo ""
+    echo "📝 TODO/FIXME가 $todo_count개 발견되었습니다."
+    echo "💡 가능하면 커밋 전에 처리해주세요."
+fi
+
+echo ""
+echo "🎉 모든 pre-commit 검증이 완료되었습니다!"
+echo "✅ Pre-commit 검증 통과!"
+
+exit 0

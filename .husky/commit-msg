@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Commit-msg hook
+# 커밋 메시지 검증을 위한 간단한 스크립트
+
+commit_msg_file="$1"
+commit_msg=$(cat "$commit_msg_file")
+
+echo ""
+echo "📝 ================ 커밋 메시지 검증 ================"
+echo "💬 커밋 메시지: $commit_msg"
+
+# 기본 규칙 (Conventional Commits)
+basic_pattern="^(feat|fix|docs|style|refactor|test|chore|perf|main)(\(.+\))?: .{1,100}"
+merge_pattern="^Merge (branch|pull request)"
+
+# Merge 커밋은 허용
+case "$commit_msg" in
+    Merge\ branch*|Merge\ pull\ request*)
+        echo "✅ Merge 커밋입니다."
+        echo "🎉 커밋 메시지 검증이 완료되었습니다!"
+        echo "=================================================="
+        exit 0
+        ;;
+esac
+
+# 기본 패턴 검증 (간단한 형태로)
+case "$commit_msg" in
+    feat\(*|fix\(*|docs\(*|style\(*|refactor\(*|test\(*|chore\(*|perf\(*|main\(*)
+        echo "✅ 커밋 메시지 형식이 올바릅니다."
+        echo "🎉 커밋 메시지 검증이 완료되었습니다!"
+        echo "=================================================="
+        exit 0
+        ;;
+    *)
+        echo ""
+        echo "❌ 기본 커밋 메시지 규칙 위반!"
+        echo "📋 형식: type(scope): description"
+        echo "✅ 예시: feat(auth): 사용자 로그인 기능 추가"
+        echo "✅ 예시: main(api-server,client): base setup"
+        echo "=================================================="
+        exit 1
+        ;;
+esac
