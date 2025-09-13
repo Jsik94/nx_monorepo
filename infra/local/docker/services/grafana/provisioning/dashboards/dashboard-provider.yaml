@@ -1,0 +1,14 @@
+# 대시보드 프로바이더 설정
+apiVersion: 1
+
+providers:
+  - name: 'local-dashboards'
+    orgId: 1
+    folder: 'Local Dashboards'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: true

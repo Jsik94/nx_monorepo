@@ -1,0 +1,98 @@
+# Loki 단일/모놀리식 구성
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9096
+
+common:
+  instance_addr: 127.0.0.1
+  path_prefix: /loki
+  storage:
+    filesystem:
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
+  replication_factor: 1
+  ring:
+    kvstore:
+      store: inmemory
+
+query_range:
+  results_cache:
+    cache:
+      embedded_cache:
+        enabled: true
+        max_size_mb: 100
+
+schema_config:
+  configs:
+    - from: 2020-10-24
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v11
+      index:
+        prefix: index_
+        period: 24h
+
+ruler:
+  alertmanager_url: http://localhost:9093
+
+# 테이블 매니저 설정
+table_manager:
+  retention_deletes_enabled: false
+  retention_period: 0s
+
+# 수집 제한
+limits_config:
+  enforce_metric_name: false
+  reject_old_samples: true
+  reject_old_samples_max_age: 168h
+  ingestion_rate_mb: 64
+  ingestion_burst_size_mb: 128
+  max_line_size: 256000
+  max_streams_per_user: 10000
+  max_entries_limit_per_query: 5000
+
+# 청크 저장소 설정
+chunk_store_config:
+  max_look_back_period: 0s
+
+# 스토리지 설정
+storage_config:
+  boltdb_shipper:
+    active_index_directory: /loki/boltdb-shipper-active
+    cache_location: /loki/boltdb-shipper-cache
+    cache_ttl: 24h
+    shared_store: filesystem
+  filesystem:
+    directory: /loki/chunks
+
+# 압축기 설정
+compactor:
+  working_directory: /loki/boltdb-shipper-compactor
+  shared_store: filesystem
+
+# 분석기 설정 (Bloom 필터)
+bloom_build:
+  enabled: false
+
+bloom_gateway:
+  enabled: false
+
+# 쿼리 스케줄러 설정
+query_scheduler:
+  max_outstanding_requests_per_tenant: 256
+
+# 프론트엔드 설정
+frontend:
+  max_outstanding_per_tenant: 256
+  compress_responses: true
+  log_queries_longer_than: 5s
+
+# 쿼리 범위 설정 추가
+querier:
+  max_concurrent: 20
+
+# 삭제 API 활성화
+delete_request:
+  enabled: true

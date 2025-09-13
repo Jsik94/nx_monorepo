@@ -1,0 +1,1 @@
+docker-compose -f infrastructure/local/docker/docker-compose.base.yml --profile db up -d 

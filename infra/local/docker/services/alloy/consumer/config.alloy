@@ -1,0 +1,56 @@
+# Alloy Consumer Configuration
+# Kafka에서 로그 소비하여 Loki로 전송
+
+// Kafka 컨슈머
+loki.source.kafka "log_consumer" {
+  brokers = ["kafka:9092"]
+  topics  = ["logs"]
+  
+  // 컨슈머 그룹 설정
+  consumer_group = "loki-consumer-group"
+  
+  // 추가 Kafka 설정
+  kafka_config = {
+    "auto.offset.reset" = "earliest"
+    "enable.auto.commit" = "true"
+    "auto.commit.interval.ms" = "1000"
+  }
+  
+  forward_to = [loki.process.format_logs.receiver]
+}
+
+// 로그 포맷팅 및 추가 처리
+loki.process "format_logs" {
+  forward_to = [loki.write.loki_endpoint.receiver]
+  
+  // 타임스탬프 정규화
+  stage.timestamp {
+    source = "timestamp"
+    format = "RFC3339"
+  }
+  
+  // 메트릭 추출 (선택사항)
+  stage.metrics {
+    counter {
+      name        = "log_lines_total"
+      description = "Total number of log lines processed"
+      prefix      = "alloy_"
+    }
+  }
+}
+
+// Loki 엔드포인트
+loki.write "loki_endpoint" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+    
+    // 배치 설정
+    batch_wait = "1s"
+    batch_size = 1048576  // 1MB
+    
+    // 재시도 설정
+    max_retries   = 5
+    min_backoff   = "500ms"
+    max_backoff   = "5m"
+  }
+}
